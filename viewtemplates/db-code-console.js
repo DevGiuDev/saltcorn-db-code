@@ -1,4 +1,7 @@
+const Workflow = require("@saltcorn/data/models/workflow");
 const { renderRoutineList, renderRoutineDetail } = require("../lib/render-routines");
+
+const configuration_workflow = () => new Workflow({ steps: [] });
 
 const get_state_fields = () => [
   {
@@ -25,6 +28,7 @@ module.exports = {
   display_name: "DB Code Console",
   description: "Administrative console for PostgreSQL routines in the current Saltcorn tenant schema.",
   tableless: true,
+  configuration_workflow,
   get_state_fields,
   run
 };

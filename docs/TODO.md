@@ -5,6 +5,7 @@
 - [x] Initialize the plugin repository structure.
 - [x] Add a basic Saltcorn plugin export.
 - [x] Add `DBCodeConsole` tableless view pattern as the recommended Saltcorn entrypoint.
+- [x] Add an empty configuration workflow so Saltcorn can finish creating the tableless view cleanly.
 - [x] Add `/db-code` route for routine listing as a development/direct route.
 - [x] Add `/db-code/routine/:oid` route for routine details as a development/direct route.
 - [x] Restrict routes to Saltcorn administrators.
