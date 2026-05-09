@@ -35,6 +35,7 @@
 - [x] Add an edit form based on the current PostgreSQL routine DDL.
 - [x] Add edit actions directly in the DB Code Console list.
 - [x] Improve DB Code Console UI with an Entities-like card, toolbar, badges, search, and action buttons.
+- [x] Improve create/edit forms with the same card-based DB Code Console aesthetic.
 - [x] Use Saltcorn's code editor for edit DDL.
 - [x] Validate edited DDL starts with `CREATE FUNCTION` / `CREATE PROCEDURE` and targets the current tenant schema.
 - [ ] Add stricter identity checks to prevent accidental overload creation.
