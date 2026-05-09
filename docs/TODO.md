@@ -87,3 +87,9 @@
 - [x] Schema remapping: auto-remap DDL from source schema to current tenant schema on import.
 - [x] Export/Import buttons in DB Code Console toolbar.
 - [x] Integration tests for all export/import routes and helpers.
+
+## Completed: security hardening (May 2026)
+
+- [x] Harden DDL validation to require exactly one top-level CREATE FUNCTION/PROCEDURE statement.
+- [x] Re-validate imported DDL against tenant schema before execution.
+- [x] Sanitize `view_base_url` to prevent open redirects to external URLs.

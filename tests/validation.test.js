@@ -4,6 +4,7 @@ const { assertIdentifier, assertSafeSqlFragment } = require("../lib/validation")
 const { parseArgumentsJson, resolveTemplateValue } = require("../lib/action-args");
 const { resolveRoutineArguments, buildArgumentTemplates } = require("../lib/routine-args");
 const { quoteIdent, normalizeFunctionBody, buildCreateFunctionSql, buildCreateProcedureSql, buildDropRoutineSql, validateCreateRoutineDdl } = require("../lib/sql-builders");
+const { sanitizeViewBaseUrl, routeHref } = require("../lib/view-context");
 
 test("valid identifiers are accepted and quoted", () => {
   assert.equal(quoteIdent("my_function_1"), '"my_function_1"');
@@ -59,6 +60,17 @@ test("DDL creation requires explicit current tenant schema", () => {
   assert.match(validateCreateRoutineDdl('CREATE FUNCTION "tenant1"."answer"() RETURNS integer LANGUAGE sql AS $$ SELECT 1 $$;', "tenant1"), /CREATE FUNCTION/);
   assert.throws(() => validateCreateRoutineDdl("CREATE FUNCTION public.answer() RETURNS integer LANGUAGE sql AS $$ SELECT 1 $$;", "tenant1"), /tenant schema/);
   assert.throws(() => validateCreateRoutineDdl("DROP FUNCTION tenant1.answer();", "tenant1"), /must start/);
+  assert.throws(() => validateCreateRoutineDdl('CREATE FUNCTION "tenant1"."answer"() RETURNS integer LANGUAGE sql AS $$ SELECT 1 $$; DROP TABLE users;', "tenant1"), /exactly one/);
+  assert.match(validateCreateRoutineDdl("CREATE OR REPLACE FUNCTION \"tenant1\".\"semi\"() RETURNS text LANGUAGE plpgsql AS $$ BEGIN RETURN 'a;b'; END $$;", "tenant1"), /CREATE OR REPLACE FUNCTION/);
+});
+
+test("view base URL is sanitized to internal routes only", () => {
+  assert.equal(sanitizeViewBaseUrl("/view/DBCodeConsole"), "/view/DBCodeConsole");
+  assert.equal(sanitizeViewBaseUrl("/db-code"), "/db-code");
+  assert.equal(sanitizeViewBaseUrl("https://evil.test/phish"), null);
+  assert.equal(sanitizeViewBaseUrl("//evil.test/phish"), null);
+  assert.equal(sanitizeViewBaseUrl("javascript:alert(1)"), null);
+  assert.equal(routeHref("/db-code/new", "https://evil.test"), "/db-code/new");
 });
 
 test("DB_Routine argument templates resolve from row and user context", () => {

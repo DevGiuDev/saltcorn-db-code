@@ -2,6 +2,7 @@ const { requireAdmin } = require("../lib/auth");
 const { escapeHtml, page } = require("../lib/html");
 const { ensurePostgres, currentTenantSchema } = require("../lib/introspection");
 const { validateImportPack, remapSchemaInDdl, renderPackPreview } = require("../lib/export-import");
+const { validateCreateRoutineDdl } = require("../lib/sql-builders");
 const { listViewHref, viewContextInput, getViewBaseUrl } = require("../lib/view-context");
 
 const db = require("@saltcorn/data/db");
@@ -206,6 +207,7 @@ async function importExecuteRoute(req, res) {
         if (validation.pack.source_schema && validation.pack.source_schema !== schema) {
           ddl = remapSchemaInDdl(ddl, validation.pack.source_schema, schema);
         }
+        ddl = validateCreateRoutineDdl(ddl, schema);
         await db.query(ddl);
         results.push({ name: r.name, kind: r.kind, status: "ok" });
       } catch (err) {
