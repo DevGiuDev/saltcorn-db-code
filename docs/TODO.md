@@ -22,6 +22,8 @@
 - [x] Validate function names, allowed languages, volatility, and security mode.
 - [x] Add conservative validation for argument and return type SQL fragments.
 - [x] Execute `CREATE OR REPLACE FUNCTION` only in the tenant schema.
+- [x] Use Saltcorn's code editor for function body editing.
+- [x] Wrap simple plpgsql statement bodies in a `BEGIN`/`END` block automatically.
 - [x] Add readable flash or inline errors.
 - [ ] Validate creation manually inside a running PostgreSQL Saltcorn tenant.
 

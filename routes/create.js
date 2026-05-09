@@ -64,8 +64,8 @@ ${csrfInput(req)}
 </div>
 <div class="mb-3">
   <label class="form-label">Function body</label>
-  <textarea class="form-control font-monospace" name="body" rows="12" required>${escapeHtml(fieldValue(values, "body"))}</textarea>
-  <div class="form-text">Do not include CREATE FUNCTION or dollar-quote delimiters. Write only the function body.</div>
+  <textarea class="form-control to-code font-monospace" mode="text/x-sql" name="body" rows="12" required>${escapeHtml(fieldValue(values, "body"))}</textarea>
+  <div class="form-text">Do not include CREATE FUNCTION or dollar-quote delimiters. For plpgsql, you may write a full BEGIN/END block or only statements such as <code>RETURN 1;</code>; simple statement bodies are wrapped automatically.</div>
 </div>
 <div class="mb-3">
   <label class="form-label">Description</label>

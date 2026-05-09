@@ -1,7 +1,7 @@
 const test = require("node:test");
 const assert = require("node:assert/strict");
 const { assertIdentifier, assertSafeSqlFragment } = require("../lib/validation");
-const { quoteIdent, buildCreateFunctionSql, buildDropRoutineSql } = require("../lib/sql-builders");
+const { quoteIdent, normalizeFunctionBody, buildCreateFunctionSql, buildDropRoutineSql } = require("../lib/sql-builders");
 
 test("valid identifiers are accepted and quoted", () => {
   assert.equal(quoteIdent("my_function_1"), '"my_function_1"');
@@ -39,4 +39,10 @@ test("safe SQL fragments reject statement separators and comments", () => {
   assert.equal(assertSafeSqlFragment("user_id integer, active boolean", "Arguments"), "user_id integer, active boolean");
   assert.throws(() => assertSafeSqlFragment("integer; drop table users", "Return type"), /disallowed/);
   assert.throws(() => assertSafeSqlFragment("integer -- comment", "Return type"), /disallowed/);
+});
+
+test("plpgsql statement bodies are wrapped in a block", () => {
+  assert.equal(normalizeFunctionBody("RETURN 1", "plpgsql"), "BEGIN\n  RETURN 1;\nEND");
+  assert.equal(normalizeFunctionBody("BEGIN\nRETURN 1;\nEND", "plpgsql"), "BEGIN\nRETURN 1;\nEND");
+  assert.equal(normalizeFunctionBody("SELECT 1", "sql"), "SELECT 1");
 });
