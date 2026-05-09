@@ -24,8 +24,16 @@ TODO
 
 ![New function screen](./screenshots/new_function.png)
 
+![Test functions screen](./screenshots/test_functions.png)
 
-## Local installation during development
+
+## Installation
+
+You can install directly from your saltcorn instance. 
+- Go to Settings - Modules
+- Choose "Add another module" under top right dropdown menu.
+- Fill name, source (npm) and saltcorn-db-code as Location.
+- Create a View with View Pattern DBCodeConsole
 
 From the Saltcorn checkout:
 

@@ -1,7 +1,7 @@
 {
   "name": "saltcorn-db-code",
   "version": "0.1.0",
-  "description": "Saltcorn plugin to inspect and manage PostgreSQL database routines.",
+  "description": "Saltcorn plugin to inspect and manage PostgreSQL database routines (functions and stored procedures) from the Saltcorn UI.",
   "main": "index.js",
   "scripts": {
     "test": "node --test",
@@ -9,14 +9,27 @@
   },
   "keywords": [
     "saltcorn",
-    "plugin",
+    "saltcorn-plugin",
     "postgresql",
+    "database",
     "functions",
-    "procedures"
+    "stored-procedures",
+    "sql",
+    "ddl"
   ],
-  "author": "devgiu",
+  "author": "DevGiu",
   "license": "MIT",
-  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/DevGiuDev/saltcorn-db-code.git"
+  },
+  "bugs": {
+    "url": "https://github.com/DevGiuDev/saltcorn-db-code/issues"
+  },
+  "homepage": "https://github.com/DevGiuDev/saltcorn-db-code#readme",
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "peerDependencies": {
     "@saltcorn/data": "*"
   }
