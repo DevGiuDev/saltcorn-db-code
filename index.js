@@ -4,12 +4,14 @@ const placeholder = require("./routes/placeholder");
 const { createFormRoute, createPostRoute, createProcedureFormRoute, createProcedurePostRoute, createDdlFormRoute, createDdlPostRoute } = require("./routes/create");
 const { editFormRoute, editPostRoute } = require("./routes/edit");
 const { deleteFormRoute, deletePostRoute } = require("./routes/delete");
+const { DB_Routine } = require("./lib/db-routine-action");
 const dbCodeConsole = require("./viewtemplates/db-code-console");
 
 module.exports = {
   sc_plugin_api_version: 1,
   plugin_name: "db-code",
   viewtemplates: [dbCodeConsole],
+  actions: { DB_Routine },
   routes: [
     { url: "/db-code", method: "get", callback: listRoute },
     { url: "/db-code/routine/:oid", method: "get", callback: showRoute },

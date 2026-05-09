@@ -2,8 +2,6 @@
 
 Saltcorn DB Code is a Saltcorn plugin for inspecting and managing PostgreSQL database code objects from the Saltcorn UI.
 
-The MVP is PostgreSQL-only and currently supports:
-
 - List functions and procedures in the current tenant schema.
 - View routine metadata.
 - View the full SQL definition returned by PostgreSQL.
@@ -12,8 +10,20 @@ The MVP is PostgreSQL-only and currently supports:
 - Create routines from full DDL when you already have the exact PostgreSQL SQL.
 - Edit routines from their current PostgreSQL DDL.
 - Delete routines with confirmation and without default `CASCADE`.
+- Call routines from Saltcorn events/workflows through the `DB_Routine` action.
 - Restrict access to Saltcorn administrators.
 - Show a clear unsupported-database message on SQLite.
+
+TODO
+
+- Storeds as Action from triggers, callable from scheduled or API calls
+
+## Some Screenshots
+
+![Main screen](./screenshots/main.png)
+
+![New function screen](./screenshots/new_function.png)
+
 
 ## Local installation during development
 

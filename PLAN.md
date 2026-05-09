@@ -414,7 +414,7 @@ Ajustar según comando real disponible en el CLI local.
 
 ### Estado
 
-Pendiente de planificar en detalle.
+Planificada e implementación inicial añadida.
 
 ### Objetivo
 
@@ -427,15 +427,18 @@ Esto permitiría casos como:
 - Llamar una routine desde botones, workflows u otros eventos Saltcorn.
 - Reutilizar lógica SQL centralizada en workflows de aplicación.
 
-### Ideas iniciales
+### Alcance de implementación inicial
 
-- Exponer una action plugin configurable desde Saltcorn.
-- Seleccionar routine desde las routines existentes del schema tenant.
-- Mapear parámetros desde el contexto del evento/workflow.
-- Usar parámetros preparados para valores.
-- Restringir ejecución a una whitelist configurable o a routines seleccionadas explícitamente.
-- Diferenciar funciones (`SELECT ...`) y procedimientos (`CALL ...`).
-- Registrar auditoría mínima de ejecución, errores y usuario/contexto.
+- [x] Exponer una action plugin configurable desde Saltcorn: `DB_Routine`.
+- [x] Seleccionar routine desde las routines existentes del schema tenant.
+- [x] Mapear parámetros posicionales desde un JSON array.
+- [x] Permitir plantillas simples desde contexto: `{{row.id}}`, `{{user.email}}`, `{{configuration.key}}`.
+- [x] Usar parámetros preparados para valores.
+- [x] Diferenciar funciones (`SELECT * FROM routine(...)`) y procedimientos (`CALL routine(...)`).
+- [ ] Validar manualmente desde eventos `API_CALL`, disparadores temporizados y workflows.
+- [ ] Añadir configuración de whitelist/allowlist explícita por routine.
+- [ ] Añadir auditoría mínima de ejecución, errores y usuario/contexto.
+- [ ] Mejorar introspección de argumentos para generar formularios específicos en vez de JSON posicional.
 
 ### Riesgos a analizar
 

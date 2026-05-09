@@ -1,6 +1,7 @@
 const test = require("node:test");
 const assert = require("node:assert/strict");
 const { assertIdentifier, assertSafeSqlFragment } = require("../lib/validation");
+const { parseArgumentsJson, resolveTemplateValue } = require("../lib/action-args");
 const { quoteIdent, normalizeFunctionBody, buildCreateFunctionSql, buildCreateProcedureSql, buildDropRoutineSql, validateCreateRoutineDdl } = require("../lib/sql-builders");
 
 test("valid identifiers are accepted and quoted", () => {
@@ -57,4 +58,12 @@ test("DDL creation requires explicit current tenant schema", () => {
   assert.match(validateCreateRoutineDdl('CREATE FUNCTION "tenant1"."answer"() RETURNS integer LANGUAGE sql AS $$ SELECT 1 $$;', "tenant1"), /CREATE FUNCTION/);
   assert.throws(() => validateCreateRoutineDdl("CREATE FUNCTION public.answer() RETURNS integer LANGUAGE sql AS $$ SELECT 1 $$;", "tenant1"), /tenant schema/);
   assert.throws(() => validateCreateRoutineDdl("DROP FUNCTION tenant1.answer();", "tenant1"), /must start/);
+});
+
+test("DB_Routine argument templates resolve from row and user context", () => {
+  const context = { row: { id: 7, name: "Ada" }, user: { email: "ada@example.com" }, configuration: { source: "api" } };
+  assert.equal(resolveTemplateValue("{{row.id}}", context), 7);
+  assert.equal(resolveTemplateValue("User {{user.email}}", context), "User ada@example.com");
+  assert.deepEqual(parseArgumentsJson('["{{row.id}}", "{{user.email}}", "{{configuration.source}}"]', context), [7, "ada@example.com", "api"]);
+  assert.throws(() => parseArgumentsJson('{"id": "{{row.id}}"}', context), /array/);
 });

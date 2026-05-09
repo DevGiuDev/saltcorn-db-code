@@ -54,5 +54,9 @@
 
 - [ ] Function execution/testing UI with prepared parameters.
 - [ ] Plugin configuration workflow.
-- [ ] Plan action type `DB_Routine` for events/workflows/API_CALL/timed triggers.
+- [x] Plan action type `DB_Routine` for events/workflows/API_CALL/timed triggers.
+- [x] Implement initial `DB_Routine` action with routine selection and positional JSON arguments.
+- [ ] Validate `DB_Routine` manually from an `API_CALL` event.
+- [ ] Validate `DB_Routine` manually from a timed trigger.
+- [ ] Add explicit routine allowlist/configuration before exposing broadly.
 - [ ] Trigger and view management research.

@@ -5,6 +5,7 @@ yarn-error.log*
 .pnpm-store/
 coverage/
 .nyc_output/
+screenshots/
 .DS_Store
 .env
 .env.*
