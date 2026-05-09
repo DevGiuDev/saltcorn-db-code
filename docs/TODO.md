@@ -17,7 +17,10 @@
 
 ## Current milestone: creation workflow
 
+- [x] Keep functions and stored procedures in the same table with a type filter.
 - [x] Build a structured function creation form.
+- [x] Build a structured stored procedure creation form.
+- [x] Add a full DDL creation form for exact PostgreSQL `CREATE FUNCTION` / `CREATE PROCEDURE` statements.
 - [x] Keep CSRF protection enabled for POST routes.
 - [x] Validate function names, allowed languages, volatility, and security mode.
 - [x] Add conservative validation for argument and return type SQL fragments.

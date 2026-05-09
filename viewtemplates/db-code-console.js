@@ -8,6 +8,11 @@ const get_state_fields = () => [
     name: "routine_oid",
     type: "Integer",
     required: false
+  },
+  {
+    name: "kind",
+    type: "String",
+    required: false
   }
 ];
 
@@ -18,9 +23,9 @@ const run = async (tableId, viewname, configuration, state, { req }) => {
 
   const baseUrl = `/view/${encodeURIComponent(viewname)}`;
   if (state && state.routine_oid) {
-    return renderRoutineDetail(state.routine_oid, { baseUrl, useViewState: true, showWriteActions: true });
+    return renderRoutineDetail(state.routine_oid, { baseUrl, useViewState: true, showWriteActions: true, kind: state.kind || "" });
   }
-  return renderRoutineList({ baseUrl, useViewState: true, showWriteActions: true });
+  return renderRoutineList({ baseUrl, useViewState: true, showWriteActions: true, kind: state.kind || "" });
 };
 
 module.exports = {

@@ -1,7 +1,7 @@
 const test = require("node:test");
 const assert = require("node:assert/strict");
 const { assertIdentifier, assertSafeSqlFragment } = require("../lib/validation");
-const { quoteIdent, normalizeFunctionBody, buildCreateFunctionSql, buildDropRoutineSql } = require("../lib/sql-builders");
+const { quoteIdent, normalizeFunctionBody, buildCreateFunctionSql, buildCreateProcedureSql, buildDropRoutineSql, validateCreateRoutineDdl } = require("../lib/sql-builders");
 
 test("valid identifiers are accepted and quoted", () => {
   assert.equal(quoteIdent("my_function_1"), '"my_function_1"');
@@ -45,4 +45,16 @@ test("plpgsql statement bodies are wrapped in a block", () => {
   assert.equal(normalizeFunctionBody("RETURN 1", "plpgsql"), "BEGIN\n  RETURN 1;\nEND");
   assert.equal(normalizeFunctionBody("BEGIN\nRETURN 1;\nEND", "plpgsql"), "BEGIN\nRETURN 1;\nEND");
   assert.equal(normalizeFunctionBody("SELECT 1", "sql"), "SELECT 1");
+});
+
+test("create procedure SQL is built with tenant schema quoting", () => {
+  const sql = buildCreateProcedureSql({ schema: "tenant1", name: "do_work", argumentsSql: "", language: "plpgsql", security: "INVOKER", body: "RAISE NOTICE 'ok'" });
+  assert.match(sql, /CREATE OR REPLACE PROCEDURE "tenant1"\."do_work"\(\)/);
+  assert.match(sql, /LANGUAGE plpgsql/);
+});
+
+test("DDL creation requires explicit current tenant schema", () => {
+  assert.match(validateCreateRoutineDdl('CREATE FUNCTION "tenant1"."answer"() RETURNS integer LANGUAGE sql AS $$ SELECT 1 $$;', "tenant1"), /CREATE FUNCTION/);
+  assert.throws(() => validateCreateRoutineDdl("CREATE FUNCTION public.answer() RETURNS integer LANGUAGE sql AS $$ SELECT 1 $$;", "tenant1"), /tenant schema/);
+  assert.throws(() => validateCreateRoutineDdl("DROP FUNCTION tenant1.answer();", "tenant1"), /must start/);
 });

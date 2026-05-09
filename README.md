@@ -7,7 +7,9 @@ The MVP is PostgreSQL-only and currently supports:
 - List functions and procedures in the current tenant schema.
 - View routine metadata.
 - View the full SQL definition returned by PostgreSQL.
-- Create functions with a structured form and Saltcorn's code editor for the function body.
+- Filter a shared routine list by function or stored procedure.
+- Create functions and stored procedures with structured forms and Saltcorn's code editor for the body.
+- Create routines from full DDL when you already have the exact PostgreSQL SQL.
 - Restrict access to Saltcorn administrators.
 - Show a clear unsupported-database message on SQLite.
 

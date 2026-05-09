@@ -4,7 +4,7 @@ const { renderRoutineList } = require("../lib/render-routines");
 
 async function listRoute(req, res) {
   if (!requireAdmin(req, res)) return;
-  page(req, res, "DB Code", await renderRoutineList());
+  page(req, res, "DB Code", await renderRoutineList({ kind: req.query?.kind || "" }));
 }
 
 module.exports = listRoute;
