@@ -10,5 +10,6 @@
 - The MVP is PostgreSQL-only. SQLite must fail with a clear message.
 - Only Saltcorn administrators may access plugin routes.
 - Keep `docs/TODO.md` updated whenever scope or implementation status changes.
-- Prefer small modules under `lib/` and route handlers under `routes/`.
+- Prefer the `DBCodeConsole` tableless view pattern as the public Saltcorn entrypoint; keep direct routes as support/development endpoints.
+- Prefer small modules under `lib/`, route handlers under `routes/`, and view patterns under `viewtemplates/`.
 - Run `npm test` and `npm run lint` before handing off changes when possible.

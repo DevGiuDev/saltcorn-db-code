@@ -4,8 +4,9 @@
 
 - [x] Initialize the plugin repository structure.
 - [x] Add a basic Saltcorn plugin export.
-- [x] Add `/db-code` route for routine listing.
-- [x] Add `/db-code/routine/:oid` route for routine details.
+- [x] Add `DBCodeConsole` tableless view pattern as the recommended Saltcorn entrypoint.
+- [x] Add `/db-code` route for routine listing as a development/direct route.
+- [x] Add `/db-code/routine/:oid` route for routine details as a development/direct route.
 - [x] Restrict routes to Saltcorn administrators.
 - [x] Resolve the current Saltcorn tenant schema through Saltcorn DB APIs.
 - [x] Block SQLite with a clear unsupported-database message.

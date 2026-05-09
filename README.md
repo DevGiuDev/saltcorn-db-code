@@ -19,13 +19,15 @@ cd /home/devgiu/dev/saltcorn
 ./packages/saltcorn-cli/bin/saltcorn dev:localize-plugin db-code /home/devgiu/dev/saltcorn-db-code
 ```
 
-After loading the plugin, open:
+After loading the plugin, create a Saltcorn view with the `DBCodeConsole` view pattern. This is the recommended entrypoint because it behaves like other Saltcorn plugin consoles and can be added to menus normally.
+
+Alternative direct route for development:
 
 ```txt
 /db-code
 ```
 
-Administrators can add a normal Saltcorn menu link to `/db-code`.
+Administrators can add either the created view URL, usually `/view/<view-name>`, or the direct `/db-code` route to a normal Saltcorn menu link.
 
 ## Development commands
 

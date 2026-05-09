@@ -1,10 +1,12 @@
 const listRoute = require("./routes/list");
 const showRoute = require("./routes/show");
 const placeholder = require("./routes/placeholder");
+const dbCodeConsole = require("./viewtemplates/db-code-console");
 
 module.exports = {
   sc_plugin_api_version: 1,
   plugin_name: "db-code",
+  viewtemplates: [dbCodeConsole],
   routes: [
     { url: "/db-code", method: "get", callback: listRoute },
     { url: "/db-code/routine/:oid", method: "get", callback: showRoute },
