@@ -30,10 +30,18 @@
 - [x] Add readable flash or inline errors.
 - [ ] Validate creation manually inside a running PostgreSQL Saltcorn tenant.
 
+## Current milestone: edit workflow
+
+- [x] Add an edit form based on the current PostgreSQL routine DDL.
+- [x] Use Saltcorn's code editor for edit DDL.
+- [x] Validate edited DDL starts with `CREATE FUNCTION` / `CREATE PROCEDURE` and targets the current tenant schema.
+- [ ] Add stricter identity checks to prevent accidental overload creation.
+- [ ] Validate editing manually inside a running PostgreSQL Saltcorn tenant.
+
 ## Later milestones
 
-- [ ] Safe edit workflow that preserves function identity.
 - [ ] Safe delete workflow without default `CASCADE`.
 - [ ] Function execution/testing UI with prepared parameters.
 - [ ] Plugin configuration workflow.
+- [ ] Plan action type `DB_Routine` for events/workflows/API_CALL/timed triggers.
 - [ ] Trigger and view management research.

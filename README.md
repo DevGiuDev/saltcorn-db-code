@@ -10,6 +10,7 @@ The MVP is PostgreSQL-only and currently supports:
 - Filter a shared routine list by function or stored procedure.
 - Create functions and stored procedures with structured forms and Saltcorn's code editor for the body.
 - Create routines from full DDL when you already have the exact PostgreSQL SQL.
+- Edit routines from their current PostgreSQL DDL.
 - Restrict access to Saltcorn administrators.
 - Show a clear unsupported-database message on SQLite.
 

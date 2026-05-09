@@ -410,6 +410,43 @@ Ajustar según comando real disponible en el CLI local.
 
 ---
 
+## Fase 9: Acción `DB_Routine` para eventos y workflows
+
+### Estado
+
+Pendiente de planificar en detalle.
+
+### Objetivo
+
+Crear un tipo de acción Saltcorn, por ejemplo `DB_Routine`, que permita invocar una función o procedimiento PostgreSQL dado de alta en el schema del tenant desde el sistema de eventos/workflows de Saltcorn.
+
+Esto permitiría casos como:
+
+- Crear un evento de tipo `API_CALL` que pueda llamarse externamente y ejecute una routine de base de datos.
+- Ejecutar una routine desde un disparador temporizado.
+- Llamar una routine desde botones, workflows u otros eventos Saltcorn.
+- Reutilizar lógica SQL centralizada en workflows de aplicación.
+
+### Ideas iniciales
+
+- Exponer una action plugin configurable desde Saltcorn.
+- Seleccionar routine desde las routines existentes del schema tenant.
+- Mapear parámetros desde el contexto del evento/workflow.
+- Usar parámetros preparados para valores.
+- Restringir ejecución a una whitelist configurable o a routines seleccionadas explícitamente.
+- Diferenciar funciones (`SELECT ...`) y procedimientos (`CALL ...`).
+- Registrar auditoría mínima de ejecución, errores y usuario/contexto.
+
+### Riesgos a analizar
+
+- Seguridad al exponer routines vía eventos externos/API.
+- Validación y conversión de argumentos.
+- Manejo de resultados para funciones tabulares, escalares y JSON.
+- Permisos por rol y por origen del evento.
+- Efectos secundarios en procedimientos llamados desde triggers temporizados o API pública.
+
+---
+
 ## Riesgos técnicos
 
 ### SQL injection
