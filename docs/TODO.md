@@ -42,9 +42,16 @@
 - [ ] Add stricter identity checks to prevent accidental overload creation.
 - [ ] Validate editing manually inside a running PostgreSQL Saltcorn tenant.
 
+## Current milestone: delete workflow
+
+- [x] Add delete confirmation screen.
+- [x] Require typing the routine name before deletion.
+- [x] Show direct dependencies from `pg_depend`.
+- [x] Execute `DROP FUNCTION` / `DROP PROCEDURE` without `CASCADE`.
+- [ ] Validate deletion manually inside a running PostgreSQL Saltcorn tenant.
+
 ## Later milestones
 
-- [ ] Safe delete workflow without default `CASCADE`.
 - [ ] Function execution/testing UI with prepared parameters.
 - [ ] Plugin configuration workflow.
 - [ ] Plan action type `DB_Routine` for events/workflows/API_CALL/timed triggers.
