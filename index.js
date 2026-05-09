@@ -4,6 +4,7 @@ const placeholder = require("./routes/placeholder");
 const { createFormRoute, createPostRoute, createProcedureFormRoute, createProcedurePostRoute, createDdlFormRoute, createDdlPostRoute } = require("./routes/create");
 const { editFormRoute, editPostRoute } = require("./routes/edit");
 const { deleteFormRoute, deletePostRoute } = require("./routes/delete");
+const { generateRoutineSqlRoute } = require("./routes/ai");
 const { DB_Routine } = require("./lib/db-routine-action");
 const dbCodeConsole = require("./viewtemplates/db-code-console");
 
@@ -25,6 +26,7 @@ module.exports = {
     { url: "/db-code/routine/:oid/edit", method: "post", callback: editPostRoute },
     { url: "/db-code/routine/:oid/delete", method: "get", callback: deleteFormRoute },
     { url: "/db-code/routine/:oid/delete", method: "post", callback: deletePostRoute },
-    { url: "/db-code/routine/:oid/execute", method: "get", callback: placeholder("Execute routine", "Routine execution is planned for a later milestone.") }
+    { url: "/db-code/routine/:oid/execute", method: "get", callback: placeholder("Execute routine", "Routine execution is planned for a later milestone.") },
+    { url: "/db-code/ai/generate-sql", method: "post", callback: generateRoutineSqlRoute }
   ]
 };

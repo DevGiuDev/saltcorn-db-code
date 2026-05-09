@@ -56,7 +56,11 @@
 - [ ] Plugin configuration workflow.
 - [x] Plan action type `DB_Routine` for events/workflows/API_CALL/timed triggers.
 - [x] Implement initial `DB_Routine` action with routine selection and positional JSON arguments.
+- [x] Improve `DB_Routine` argument introspection (arity validation + named JSON object support).
 - [ ] Validate `DB_Routine` manually from an `API_CALL` event.
+- [ ] Revisit argument helper UX later (currently removed due instability in action config UI).
 - [ ] Validate `DB_Routine` manually from a timed trigger.
 - [ ] Add explicit routine allowlist/configuration before exposing broadly.
 - [ ] Trigger and view management research.
+- [ ] Add an `Edit with AI` button in `DB_Routine` action config, similar to `run_js_code` trigger UX, to generate SQL routine code from a prompt (using Copilot/Agents integration with project context).
+- [x] Add `Edit with AI` buttons to DB Code create/edit routine pages (prompt -> SQL generation via available Copilot function).

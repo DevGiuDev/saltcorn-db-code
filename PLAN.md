@@ -439,6 +439,8 @@ Esto permitiría casos como:
 - [ ] Añadir configuración de whitelist/allowlist explícita por routine.
 - [ ] Añadir auditoría mínima de ejecución, errores y usuario/contexto.
 - [ ] Mejorar introspección de argumentos para generar formularios específicos en vez de JSON posicional.
+- [x] Mejorar introspección base en `DB_Routine`: metadatos de argumentos de entrada (`input_args`), validación de aridad requerida/opcional y soporte de JSON objeto por nombre.
+- [ ] Añadir flujo `Edit with AI` para `DB_Routine` similar a `run_js_code` (prompt -> generación de código SQL de routine con contexto de proyecto).
 
 ### Riesgos a analizar
 
