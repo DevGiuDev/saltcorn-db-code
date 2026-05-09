@@ -75,12 +75,12 @@ ${csrfInput(req)}
 </form>`;
 }
 
-async function createFormRoute({ req, res }) {
+async function createFormRoute(req, res) {
   if (!requireAdmin(req, res)) return;
   page(req, res, "New function", renderCreateForm(req));
 }
 
-async function createPostRoute({ req, res }) {
+async function createPostRoute(req, res) {
   if (!requireAdmin(req, res)) return;
   const values = req.body || {};
   try {
