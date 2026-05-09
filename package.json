@@ -1,0 +1,23 @@
+{
+  "name": "saltcorn-db-code",
+  "version": "0.1.0",
+  "description": "Saltcorn plugin to inspect and manage PostgreSQL database routines.",
+  "main": "index.js",
+  "scripts": {
+    "test": "node --test",
+    "lint": "node --check index.js && node --check lib/*.js && node --check routes/*.js"
+  },
+  "keywords": [
+    "saltcorn",
+    "plugin",
+    "postgresql",
+    "functions",
+    "procedures"
+  ],
+  "author": "devgiu",
+  "license": "MIT",
+  "devDependencies": {},
+  "peerDependencies": {
+    "@saltcorn/data": "*"
+  }
+}
