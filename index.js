@@ -1,10 +1,13 @@
 const listRoute = require("./routes/list");
 const showRoute = require("./routes/show");
 const placeholder = require("./routes/placeholder");
+const { executeFormRoute, executePostRoute } = require("./routes/execute");
 const { createFormRoute, createPostRoute, createProcedureFormRoute, createProcedurePostRoute, createDdlFormRoute, createDdlPostRoute } = require("./routes/create");
 const { editFormRoute, editPostRoute } = require("./routes/edit");
 const { deleteFormRoute, deletePostRoute } = require("./routes/delete");
 const { generateRoutineSqlRoute } = require("./routes/ai");
+const { exportFormRoute, exportPostRoute } = require("./routes/export");
+const { importFormRoute, importPostRoute, importExecuteRoute } = require("./routes/import");
 const { DB_Routine } = require("./lib/db-routine-action");
 const dbCodeConsole = require("./viewtemplates/db-code-console");
 
@@ -26,7 +29,13 @@ module.exports = {
     { url: "/db-code/routine/:oid/edit", method: "post", callback: editPostRoute },
     { url: "/db-code/routine/:oid/delete", method: "get", callback: deleteFormRoute },
     { url: "/db-code/routine/:oid/delete", method: "post", callback: deletePostRoute },
-    { url: "/db-code/routine/:oid/execute", method: "get", callback: placeholder("Execute routine", "Routine execution is planned for a later milestone.") },
-    { url: "/db-code/ai/generate-sql", method: "post", callback: generateRoutineSqlRoute }
+    { url: "/db-code/routine/:oid/execute", method: "get", callback: executeFormRoute },
+    { url: "/db-code/routine/:oid/execute", method: "post", callback: executePostRoute },
+    { url: "/db-code/ai/generate-sql", method: "post", callback: generateRoutineSqlRoute },
+    { url: "/db-code/export", method: "get", callback: exportFormRoute },
+    { url: "/db-code/export", method: "post", callback: exportPostRoute },
+    { url: "/db-code/import", method: "get", callback: importFormRoute },
+    { url: "/db-code/import", method: "post", callback: importPostRoute },
+    { url: "/db-code/import/execute", method: "post", callback: importExecuteRoute }
   ]
 };

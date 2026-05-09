@@ -3,6 +3,7 @@ const { requireAdmin } = require("../lib/auth");
 const { escapeHtml, page } = require("../lib/html");
 const { ensurePostgres, getRoutineByOid } = require("../lib/introspection");
 const { buildDropRoutineSql } = require("../lib/sql-builders");
+const { detailViewHref, listViewHref, viewContextInput, getViewBaseUrl } = require("../lib/view-context");
 
 function csrfInput(req) {
   return typeof req.csrfToken === "function" ? `<input type="hidden" name="_csrf" value="${escapeHtml(req.csrfToken())}">` : "";
@@ -32,7 +33,7 @@ function formStyles() {
 </style>`;
 }
 
-function renderDeleteForm(req, routine, dependencies = [], error = null) {
+function renderDeleteForm(req, routine, dependencies = [], error = null, viewBaseUrl = null) {
   const dropSql = buildDropRoutineSql({
     schema: routine.schema,
     name: routine.name,
@@ -40,8 +41,9 @@ function renderDeleteForm(req, routine, dependencies = [], error = null) {
     kind: routine.kind
   });
   const hasDependencies = dependencies.length > 0;
+  const backHref = detailViewHref(viewBaseUrl, routine.oid);
   return `${formStyles()}<div class="db-code-delete">
-<p><a class="text-decoration-none" href="/db-code/routine/${routine.oid}"><i class="fas fa-arrow-left me-1"></i>Back to routine</a></p>
+<p><a class="text-decoration-none" href="${backHref}"><i class="fas fa-arrow-left me-1"></i>Back to routine</a></p>
 ${error ? `<div class="alert alert-danger"><i class="fas fa-exclamation-triangle me-2"></i>${escapeHtml(error)}</div>` : ""}
 <div class="card mt-0">
   <div class="card-header d-flex justify-content-between align-items-center flex-wrap">
@@ -49,7 +51,7 @@ ${error ? `<div class="alert alert-danger"><i class="fas fa-exclamation-triangle
       <span class="db-code-delete-icon rounded bg-danger text-white me-2"><i class="fas fa-trash"></i></span>
       <div><h5 class="mb-0">Delete ${escapeHtml(routine.kind)}: ${escapeHtml(routine.name)}</h5><div class="small text-muted">Drop this PostgreSQL routine from the current tenant schema</div></div>
     </div>
-    <a class="btn btn-sm btn-outline-secondary" href="/db-code/routine/${routine.oid}">Cancel</a>
+    <a class="btn btn-sm btn-outline-secondary" href="${backHref}">Cancel</a>
   </div>
   <div class="card-body">
     <div class="row g-4">
@@ -61,13 +63,14 @@ ${error ? `<div class="alert alert-danger"><i class="fas fa-exclamation-triangle
         <pre class="border rounded p-3 bg-light"><code>${escapeHtml(dropSql)}</code></pre>
         <form method="post" action="/db-code/routine/${routine.oid}/delete">
           ${csrfInput(req)}
+          ${viewContextInput(viewBaseUrl)}
           <div class="mb-3">
             <label class="form-label">Type the routine name to confirm</label>
             <input class="form-control" name="confirmName" required autocomplete="off" placeholder="${escapeHtml(routine.name)}">
           </div>
           <div class="d-flex gap-2">
             <button class="btn btn-danger" type="submit"><i class="fas fa-trash me-1"></i>Delete routine</button>
-            <a class="btn btn-outline-secondary" href="/db-code/routine/${routine.oid}">Cancel</a>
+            <a class="btn btn-outline-secondary" href="${backHref}">Cancel</a>
           </div>
         </form>
       </div>
@@ -102,7 +105,7 @@ async function deleteFormRoute(req, res) {
       return page(req, res, "Routine not found", `<div class="alert alert-warning">Routine not found in the current tenant schema.</div>`);
     }
     const dependencies = await getRoutineDependencies(routine.oid);
-    page(req, res, `Delete ${routine.kind}: ${routine.name}`, renderDeleteForm(req, routine, dependencies));
+    page(req, res, `Delete ${routine.kind}: ${routine.name}`, renderDeleteForm(req, routine, dependencies, null, getViewBaseUrl(req)));
   } catch (error) {
     page(req, res, "Delete routine", `<div class="alert alert-danger">${escapeHtml(error.message)}</div>`);
   }
@@ -110,6 +113,7 @@ async function deleteFormRoute(req, res) {
 
 async function deletePostRoute(req, res) {
   if (!requireAdmin(req, res)) return;
+  const viewBaseUrl = getViewBaseUrl(req);
   try {
     ensurePostgres();
     const routine = await getRoutineByOid(req.params.oid);
@@ -119,7 +123,7 @@ async function deletePostRoute(req, res) {
     }
     if ((req.body?.confirmName || "") !== routine.name) {
       const dependencies = await getRoutineDependencies(routine.oid);
-      return page(req, res, `Delete ${routine.kind}: ${routine.name}`, renderDeleteForm(req, routine, dependencies, "Confirmation name does not match."));
+      return page(req, res, `Delete ${routine.kind}: ${routine.name}`, renderDeleteForm(req, routine, dependencies, "Confirmation name does not match.", viewBaseUrl));
     }
     const dropSql = buildDropRoutineSql({
       schema: routine.schema,
@@ -129,12 +133,12 @@ async function deletePostRoute(req, res) {
     });
     await db.query(dropSql);
     if (typeof req.flash === "function") req.flash("success", `Routine ${escapeHtml(routine.name)} deleted`);
-    res.redirect(`/db-code?kind=${routine.kind === "procedure" ? "procedure" : "function"}`);
+    res.redirect(listViewHref(viewBaseUrl, routine.kind === "procedure" ? "procedure" : "function"));
   } catch (error) {
     const routine = await getRoutineByOid(req.params.oid).catch(() => null);
     if (routine) {
       const dependencies = await getRoutineDependencies(routine.oid).catch(() => []);
-      page(req, res, `Delete ${routine.kind}: ${routine.name}`, renderDeleteForm(req, routine, dependencies, error.message));
+      page(req, res, `Delete ${routine.kind}: ${routine.name}`, renderDeleteForm(req, routine, dependencies, error.message, viewBaseUrl));
     } else {
       page(req, res, "Delete routine", `<div class="alert alert-danger">${escapeHtml(error.message)}</div>`);
     }

@@ -1,6 +1,6 @@
 # TODO: Saltcorn DB Code
 
-## Current milestone: read-only PostgreSQL routines
+## Completed: read-only PostgreSQL routines
 
 - [x] Initialize the plugin repository structure.
 - [x] Add a basic Saltcorn plugin export.
@@ -12,10 +12,10 @@
 - [x] Resolve the current Saltcorn tenant schema through Saltcorn DB APIs.
 - [x] Block SQLite with a clear unsupported-database message.
 - [x] Add initial SQL builder and validation helpers for later write milestones.
-- [ ] Validate the routes inside a running Saltcorn development instance.
-- [ ] Add integration tests through Saltcorn plugin test tooling.
+- [x] Validate the routes inside a running Saltcorn development instance.
+- [x] Add integration tests through Saltcorn plugin test tooling.
 
-## Current milestone: creation workflow
+## Completed: creation workflow
 
 - [x] Keep functions and stored procedures in the same table with a type filter.
 - [x] Build a structured function creation form.
@@ -28,9 +28,9 @@
 - [x] Use Saltcorn's code editor for function body editing.
 - [x] Wrap simple plpgsql statement bodies in a `BEGIN`/`END` block automatically.
 - [x] Add readable flash or inline errors.
-- [ ] Validate creation manually inside a running PostgreSQL Saltcorn tenant.
+- [x] Validate creation manually inside a running PostgreSQL Saltcorn tenant.
 
-## Current milestone: edit workflow
+## Completed: edit workflow
 
 - [x] Add an edit form based on the current PostgreSQL routine DDL.
 - [x] Add edit actions directly in the DB Code Console list.
@@ -39,20 +39,33 @@
 - [x] Improve routine detail view with the same card-based DB Code Console aesthetic.
 - [x] Use Saltcorn's code editor for edit DDL.
 - [x] Validate edited DDL starts with `CREATE FUNCTION` / `CREATE PROCEDURE` and targets the current tenant schema.
-- [ ] Add stricter identity checks to prevent accidental overload creation.
-- [ ] Validate editing manually inside a running PostgreSQL Saltcorn tenant.
+- [x] Add stricter identity checks to prevent accidental overload creation.
+- [x] Validate editing manually inside a running PostgreSQL Saltcorn tenant.
 
-## Current milestone: delete workflow
+## Completed: delete workflow
 
 - [x] Add delete confirmation screen.
 - [x] Require typing the routine name before deletion.
 - [x] Show direct dependencies from `pg_depend`.
 - [x] Execute `DROP FUNCTION` / `DROP PROCEDURE` without `CASCADE`.
-- [ ] Validate deletion manually inside a running PostgreSQL Saltcorn tenant.
+- [x] Validate deletion manually inside a running PostgreSQL Saltcorn tenant.
+
+## Current milestone: function execution / testing
+
+- [x] Build execute form with dynamic argument fields from `input_args` introspection.
+- [x] Render form for zero-argument routines (direct execute button, no fields).
+- [x] Support functions: `SELECT * FROM schema.func($1, $2, ...)`.
+- [x] Support procedures: `CALL schema.proc($1, $2, ...)`.
+- [x] Display results as a table for rowsets and as JSON for scalars.
+- [x] Handle SQL errors with readable inline messages.
+- [x] Show execution metadata (row count, duration).
+- [x] Add execute route GET `/db-code/routine/:oid/execute`.
+- [x] Add execute route POST `/db-code/routine/:oid/execute`.
+- [x] Add integration tests for the execute routes.
+- [ ] Validate execution manually inside a running PostgreSQL Saltcorn tenant.
 
 ## Later milestones
 
-- [ ] Function execution/testing UI with prepared parameters.
 - [ ] Plugin configuration workflow.
 - [x] Plan action type `DB_Routine` for events/workflows/API_CALL/timed triggers.
 - [x] Implement initial `DB_Routine` action with routine selection and positional JSON arguments.
@@ -64,3 +77,13 @@
 - [ ] Trigger and view management research.
 - [ ] Add an `Edit with AI` button in `DB_Routine` action config, similar to `run_js_code` trigger UX, to generate SQL routine code from a prompt (using Copilot/Agents integration with project context).
 - [x] Add `Edit with AI` buttons to DB Code create/edit routine pages (prompt -> SQL generation via available Copilot function).
+
+## Completed: export/import
+
+- [x] Define JSON pack format (`saltcorn-db-code-routines` v1) with metadata + full DDL.
+- [x] Export route: list routines with checkboxes, select all/none, download JSON.
+- [x] Import route: upload JSON, validate format, preview routines with selection.
+- [x] Import execute route: run selected DDLs, show per-routine results (ok/error/skipped).
+- [x] Schema remapping: auto-remap DDL from source schema to current tenant schema on import.
+- [x] Export/Import buttons in DB Code Console toolbar.
+- [x] Integration tests for all export/import routes and helpers.

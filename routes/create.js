@@ -5,6 +5,7 @@ const { currentTenantSchema, ensurePostgres } = require("../lib/introspection");
 const { buildCreateFunctionSql, buildCreateProcedureSql, validateCreateRoutineDdl } = require("../lib/sql-builders");
 const { assertSafeSqlFragment } = require("../lib/validation");
 const { getState } = require("@saltcorn/data/db/state");
+const { listViewHref, detailViewHref, viewContextInput, getViewBaseUrl } = require("../lib/view-context");
 
 function fieldValue(body, name, fallback = "") {
   return typeof body?.[name] === "undefined" ? fallback : body[name];
@@ -98,7 +99,7 @@ function runDbCodeAi(){
 </script>`;
 }
 
-function renderStructuredRoutineForm(req, routineType, values = {}, error = null) {
+function renderStructuredRoutineForm(req, routineType, values = {}, error = null, viewBaseUrl = null) {
   const isProcedure = routineType === "procedure";
   const language = fieldValue(values, "language", "plpgsql");
   const volatility = fieldValue(values, "volatility", "VOLATILE");
@@ -106,6 +107,7 @@ function renderStructuredRoutineForm(req, routineType, values = {}, error = null
   const title = isProcedure ? "New stored procedure" : "New function";
   const action = isProcedure ? "/db-code/new-procedure" : "/db-code/new";
   const objectLabel = isProcedure ? "stored procedure" : "function";
+  const backHref = listViewHref(viewBaseUrl);
   const aside = helpCard([
     "The tenant schema is selected automatically and cannot be changed from the form.",
     "Use structured fields for safer routine creation. Use New from DDL only when you already trust the full SQL.",
@@ -114,6 +116,7 @@ function renderStructuredRoutineForm(req, routineType, values = {}, error = null
   ]);
   const body = `<form method="post" action="${action}">
 ${csrfInput(req)}
+${viewContextInput(viewBaseUrl)}
 <div class="form-section-title">Signature</div>
 <div class="row g-3">
   <div class="col-md-6">
@@ -158,12 +161,13 @@ ${csrfInput(req)}
   <label class="form-label">Description</label>
   <input class="form-control" name="description" value="${escapeHtml(fieldValue(values, "description"))}" placeholder="Optional routine description">
 </div>
-<div class="d-flex gap-2"><button class="btn btn-primary" type="submit"><i class="fas fa-save me-1"></i>Create ${objectLabel}</button><a class="btn btn-outline-secondary" href="/db-code">Cancel</a></div>
+<div class="d-flex gap-2"><button class="btn btn-primary" type="submit"><i class="fas fa-save me-1"></i>Create ${objectLabel}</button><a class="btn btn-outline-secondary" href="${backHref}">Cancel</a></div>
 </form>`;
-  return shell({ title, subtitle: `Create a PostgreSQL ${objectLabel} in the current tenant schema`, icon: isProcedure ? "fas fa-cogs" : "fas fa-cube", error, aside, body });
+  return shell({ title, subtitle: `Create a PostgreSQL ${objectLabel} in the current tenant schema`, icon: isProcedure ? "fas fa-cogs" : "fas fa-cube", error, aside, backHref, body });
 }
 
-function renderDdlForm(req, values = {}, error = null) {
+function renderDdlForm(req, values = {}, error = null, viewBaseUrl = null) {
+  const backHref = listViewHref(viewBaseUrl);
   const aside = helpCard([
     "DDL mode is intended for trusted SQL you already have.",
     "The statement must start with CREATE FUNCTION or CREATE PROCEDURE.",
@@ -172,35 +176,37 @@ function renderDdlForm(req, values = {}, error = null) {
   ], "DDL mode executes administrator-provided SQL.");
   const body = `<form method="post" action="/db-code/new-ddl">
 ${csrfInput(req)}
+${viewContextInput(viewBaseUrl)}
 <div class="form-section-title">Full DDL</div>
 <div class="mb-3">
   <label class="form-label">CREATE FUNCTION / CREATE PROCEDURE DDL</label>
   <textarea class="form-control to-code font-monospace" mode="text/x-sql" name="ddl" rows="22" required>${escapeHtml(fieldValue(values, "ddl"))}</textarea>
   ${hasCopilot() ? aiModal("ddl", "function or stored procedure") : ""}
 </div>
-<div class="d-flex gap-2"><button class="btn btn-primary" type="submit"><i class="fas fa-file-code me-1"></i>Create from DDL</button><a class="btn btn-outline-secondary" href="/db-code">Cancel</a></div>
+<div class="d-flex gap-2"><button class="btn btn-primary" type="submit"><i class="fas fa-file-code me-1"></i>Create from DDL</button><a class="btn btn-outline-secondary" href="${backHref}">Cancel</a></div>
 </form>`;
-  return shell({ title: "New from DDL", subtitle: "Create a function or stored procedure from full PostgreSQL DDL", icon: "fas fa-file-code", error, aside, body });
+  return shell({ title: "New from DDL", subtitle: "Create a function or stored procedure from full PostgreSQL DDL", icon: "fas fa-file-code", error, aside, backHref, body });
 }
 
 async function createFormRoute(req, res) {
   if (!requireAdmin(req, res)) return;
-  page(req, res, "New function", renderStructuredRoutineForm(req, "function"));
+  page(req, res, "New function", renderStructuredRoutineForm(req, "function", {}, null, getViewBaseUrl(req)));
 }
 
 async function createProcedureFormRoute(req, res) {
   if (!requireAdmin(req, res)) return;
-  page(req, res, "New stored procedure", renderStructuredRoutineForm(req, "procedure"));
+  page(req, res, "New stored procedure", renderStructuredRoutineForm(req, "procedure", {}, null, getViewBaseUrl(req)));
 }
 
 async function createDdlFormRoute(req, res) {
   if (!requireAdmin(req, res)) return;
-  page(req, res, "New from DDL", renderDdlForm(req));
+  page(req, res, "New from DDL", renderDdlForm(req, {}, null, getViewBaseUrl(req)));
 }
 
 async function createPostRoute(req, res) {
   if (!requireAdmin(req, res)) return;
   const values = req.body || {};
+  const viewBaseUrl = getViewBaseUrl(req);
   try {
     ensurePostgres();
     const argumentsSql = assertSafeSqlFragment(values.argumentsSql, "Arguments");
@@ -208,38 +214,40 @@ async function createPostRoute(req, res) {
     const sql = buildCreateFunctionSql({ schema: currentTenantSchema(), name: values.name, argumentsSql, returnType, language: values.language || "plpgsql", volatility: values.volatility || "VOLATILE", security: values.security || "INVOKER", body: values.body || "", description: values.description || "" });
     await db.query(sql);
     if (typeof req.flash === "function") req.flash("success", `Function ${escapeHtml(values.name)} created`);
-    res.redirect("/db-code?kind=function");
+    res.redirect(listViewHref(viewBaseUrl, "function"));
   } catch (error) {
-    page(req, res, "New function", renderStructuredRoutineForm(req, "function", values, error.message));
+    page(req, res, "New function", renderStructuredRoutineForm(req, "function", values, error.message, viewBaseUrl));
   }
 }
 
 async function createProcedurePostRoute(req, res) {
   if (!requireAdmin(req, res)) return;
   const values = req.body || {};
+  const viewBaseUrl = getViewBaseUrl(req);
   try {
     ensurePostgres();
     const argumentsSql = assertSafeSqlFragment(values.argumentsSql, "Arguments");
     const sql = buildCreateProcedureSql({ schema: currentTenantSchema(), name: values.name, argumentsSql, language: values.language || "plpgsql", security: values.security || "INVOKER", body: values.body || "", description: values.description || "" });
     await db.query(sql);
     if (typeof req.flash === "function") req.flash("success", `Stored procedure ${escapeHtml(values.name)} created`);
-    res.redirect("/db-code?kind=procedure");
+    res.redirect(listViewHref(viewBaseUrl, "procedure"));
   } catch (error) {
-    page(req, res, "New stored procedure", renderStructuredRoutineForm(req, "procedure", values, error.message));
+    page(req, res, "New stored procedure", renderStructuredRoutineForm(req, "procedure", values, error.message, viewBaseUrl));
   }
 }
 
 async function createDdlPostRoute(req, res) {
   if (!requireAdmin(req, res)) return;
   const values = req.body || {};
+  const viewBaseUrl = getViewBaseUrl(req);
   try {
     ensurePostgres();
     const ddl = validateCreateRoutineDdl(values.ddl, currentTenantSchema());
     await db.query(ddl);
     if (typeof req.flash === "function") req.flash("success", "Routine created from DDL");
-    res.redirect("/db-code");
+    res.redirect(listViewHref(viewBaseUrl));
   } catch (error) {
-    page(req, res, "New from DDL", renderDdlForm(req, values, error.message));
+    page(req, res, "New from DDL", renderDdlForm(req, values, error.message, viewBaseUrl));
   }
 }
 

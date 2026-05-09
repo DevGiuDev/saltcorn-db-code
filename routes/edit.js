@@ -4,6 +4,7 @@ const { escapeHtml, page } = require("../lib/html");
 const { currentTenantSchema, ensurePostgres, getRoutineByOid } = require("../lib/introspection");
 const { validateCreateRoutineDdl } = require("../lib/sql-builders");
 const { getState } = require("@saltcorn/data/db/state");
+const { detailViewHref, listViewHref, viewContextInput, getViewBaseUrl } = require("../lib/view-context");
 
 function csrfInput(req) {
   return typeof req.csrfToken === "function" ? `<input type="hidden" name="_csrf" value="${escapeHtml(req.csrfToken())}">` : "";
@@ -54,11 +55,12 @@ function runDbCodeAi(){ var ta=document.getElementById('dbCodeAiPrompt'); var pr
 </script>`;
 }
 
-function renderEditForm(req, routine, values = {}, error = null) {
+function renderEditForm(req, routine, values = {}, error = null, viewBaseUrl = null) {
   const ddl = typeof values.ddl === "undefined" ? routine.definition : values.ddl;
   const icon = routine.kind === "procedure" ? "fas fa-cogs" : "fas fa-cube";
+  const backHref = detailViewHref(viewBaseUrl, routine.oid);
   return `${formStyles()}<div class="db-code-form">
-<p><a class="text-decoration-none" href="/db-code/routine/${routine.oid}"><i class="fas fa-arrow-left me-1"></i>Back to routine</a></p>
+<p><a class="text-decoration-none" href="${backHref}"><i class="fas fa-arrow-left me-1"></i>Back to routine</a></p>
 ${error ? `<div class="alert alert-danger"><i class="fas fa-exclamation-triangle me-2"></i>${escapeHtml(error)}</div>` : ""}
 <div class="card mt-0 card-max-full-screen">
   <div class="card-header d-flex justify-content-between align-items-center flex-wrap">
@@ -66,19 +68,20 @@ ${error ? `<div class="alert alert-danger"><i class="fas fa-exclamation-triangle
       <span class="db-code-form-icon rounded bg-primary text-white me-2"><i class="${icon}"></i></span>
       <div><h5 class="mb-0">Edit ${escapeHtml(routine.kind)}: ${escapeHtml(routine.name)}</h5><div class="small text-muted">Modify the PostgreSQL DDL for this routine</div></div>
     </div>
-    <a class="btn btn-sm btn-outline-secondary" href="/db-code/routine/${routine.oid}">Cancel</a>
+    <a class="btn btn-sm btn-outline-secondary" href="${backHref}">Cancel</a>
   </div>
   <div class="card-body">
     <div class="row g-4">
       <div class="col-lg-8">
         <form method="post" action="/db-code/routine/${routine.oid}/edit">
           ${csrfInput(req)}
+          ${viewContextInput(viewBaseUrl)}
           <div class="form-section-title">Routine DDL</div>
           <div class="mb-3">
             <textarea class="form-control to-code font-monospace" mode="text/x-sql" name="ddl" rows="24" required>${escapeHtml(ddl)}</textarea>
             ${hasCopilot() ? aiModal(routine.kind) : ""}
           </div>
-          <div class="d-flex gap-2"><button class="btn btn-primary" type="submit"><i class="fas fa-save me-1"></i>Save routine</button><a class="btn btn-outline-secondary" href="/db-code/routine/${routine.oid}">Cancel</a></div>
+          <div class="d-flex gap-2"><button class="btn btn-primary" type="submit"><i class="fas fa-save me-1"></i>Save routine</button><a class="btn btn-outline-secondary" href="${backHref}">Cancel</a></div>
         </form>
       </div>
       <div class="col-lg-4"><div class="sticky-help">${helpCard(routine)}</div></div>
@@ -97,7 +100,7 @@ async function editFormRoute(req, res) {
       if (typeof res.status === "function") res.status(404);
       return page(req, res, "Routine not found", `<div class="alert alert-warning">Routine not found in the current tenant schema.</div>`);
     }
-    page(req, res, `Edit ${routine.kind}: ${routine.name}`, renderEditForm(req, routine));
+    page(req, res, `Edit ${routine.kind}: ${routine.name}`, renderEditForm(req, routine, {}, null, getViewBaseUrl(req)));
   } catch (error) {
     page(req, res, "Edit routine", `<div class="alert alert-danger">${escapeHtml(error.message)}</div>`);
   }
@@ -106,6 +109,7 @@ async function editFormRoute(req, res) {
 async function editPostRoute(req, res) {
   if (!requireAdmin(req, res)) return;
   const values = req.body || {};
+  const viewBaseUrl = getViewBaseUrl(req);
   try {
     ensurePostgres();
     const routine = await getRoutineByOid(req.params.oid);
@@ -116,10 +120,10 @@ async function editPostRoute(req, res) {
     const ddl = validateCreateRoutineDdl(values.ddl, currentTenantSchema());
     await db.query(ddl);
     if (typeof req.flash === "function") req.flash("success", `Routine ${escapeHtml(routine.name)} saved`);
-    res.redirect(`/db-code/routine/${routine.oid}`);
+    res.redirect(detailViewHref(viewBaseUrl, routine.oid));
   } catch (error) {
     const routine = await getRoutineByOid(req.params.oid).catch(() => null);
-    if (routine) page(req, res, `Edit ${routine.kind}: ${routine.name}`, renderEditForm(req, routine, values, error.message));
+    if (routine) page(req, res, `Edit ${routine.kind}: ${routine.name}`, renderEditForm(req, routine, values, error.message, viewBaseUrl));
     else page(req, res, "Edit routine", `<div class="alert alert-danger">${escapeHtml(error.message)}</div>`);
   }
 }

@@ -1,6 +1,20 @@
 const { getState } = require("@saltcorn/data/db/state");
 const { requireAdmin } = require("../lib/auth");
 
+/**
+ * Strip markdown code fences that LLMs sometimes add despite instructions.
+ * Handles ```sql ... ```, ``` ... ```, and leading/trailing whitespace.
+ */
+function stripMarkdownFences(text) {
+  let out = String(text || "").trim();
+  // Remove opening fence with optional language tag
+  out = out.replace(/^```(?:sql|postgresql|plpgsql)?\s*\n?/i, "");
+  // Remove closing fence
+  out = out.replace(/\n?```\s*$/,
+ "");
+  return out.trim();
+}
+
 async function generateRoutineSqlRoute(req, res) {
   if (!requireAdmin(req, res)) return;
   try {
@@ -12,8 +26,19 @@ async function generateRoutineSqlRoute(req, res) {
     const copilot = getState()?.functions?.copilot_generate_javascript;
     if (!copilot?.run) return res.json({ error: "Copilot generation is not available." });
 
-    const sqlPrompt = `Generate PostgreSQL ${routineType} SQL code for Saltcorn tenant schema. ${description}. Return SQL code only, no markdown fences.`;
-    const code = await copilot.run(sqlPrompt, existingCode, null);
+    const sqlPrompt = [
+      `You are a PostgreSQL code generator.`,
+      `Task: ${description}`,
+      existingCode ? `Existing code to modify:\n${existingCode}` : "",
+      `Constraints:`,
+      `- Output MUST be a single valid PostgreSQL ${routineType} DDL statement.`,
+      `- It MUST start with CREATE OR REPLACE ${routineType === "stored procedure" ? "PROCEDURE" : "FUNCTION"}.`,
+      `- Do NOT include markdown fences, comments, or any text outside the SQL statement.`,
+      `- Do NOT wrap output in backticks or code blocks.`,
+      `- Use dollar-quoting ($body$...$body$) for the routine body.`,
+      `- Output raw SQL only. Nothing else.`,
+    ].filter(Boolean).join("\n\n");
+    const code = stripMarkdownFences(await copilot.run(sqlPrompt, existingCode, null));
     return res.json({ code });
   } catch (error) {
     return res.json({ error: error.message || "AI generation failed." });
