@@ -15,13 +15,15 @@
 - [ ] Validate the routes inside a running Saltcorn development instance.
 - [ ] Add integration tests through Saltcorn plugin test tooling.
 
-## Next milestone: creation workflow
+## Current milestone: creation workflow
 
-- [ ] Build a structured function creation form.
-- [ ] Keep CSRF protection enabled for POST routes.
-- [ ] Validate function names, allowed languages, volatility, and security mode.
-- [ ] Execute `CREATE OR REPLACE FUNCTION` only in the tenant schema.
-- [ ] Add readable flash or inline errors.
+- [x] Build a structured function creation form.
+- [x] Keep CSRF protection enabled for POST routes.
+- [x] Validate function names, allowed languages, volatility, and security mode.
+- [x] Add conservative validation for argument and return type SQL fragments.
+- [x] Execute `CREATE OR REPLACE FUNCTION` only in the tenant schema.
+- [x] Add readable flash or inline errors.
+- [ ] Validate creation manually inside a running PostgreSQL Saltcorn tenant.
 
 ## Later milestones
 

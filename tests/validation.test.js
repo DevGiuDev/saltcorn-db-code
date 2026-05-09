@@ -1,6 +1,6 @@
 const test = require("node:test");
 const assert = require("node:assert/strict");
-const { assertIdentifier } = require("../lib/validation");
+const { assertIdentifier, assertSafeSqlFragment } = require("../lib/validation");
 const { quoteIdent, buildCreateFunctionSql, buildDropRoutineSql } = require("../lib/sql-builders");
 
 test("valid identifiers are accepted and quoted", () => {
@@ -33,4 +33,10 @@ test("drop routine SQL does not use cascade", () => {
     buildDropRoutineSql({ schema: "tenant1", name: "answer", identityArguments: "", kind: "function" }),
     'DROP FUNCTION "tenant1"."answer"();'
   );
+});
+
+test("safe SQL fragments reject statement separators and comments", () => {
+  assert.equal(assertSafeSqlFragment("user_id integer, active boolean", "Arguments"), "user_id integer, active boolean");
+  assert.throws(() => assertSafeSqlFragment("integer; drop table users", "Return type"), /disallowed/);
+  assert.throws(() => assertSafeSqlFragment("integer -- comment", "Return type"), /disallowed/);
 });

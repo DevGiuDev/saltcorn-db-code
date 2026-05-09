@@ -18,9 +18,9 @@ const run = async (tableId, viewname, configuration, state, { req }) => {
 
   const baseUrl = `/view/${encodeURIComponent(viewname)}`;
   if (state && state.routine_oid) {
-    return renderRoutineDetail(state.routine_oid, { baseUrl, useViewState: true, showWriteActions: false });
+    return renderRoutineDetail(state.routine_oid, { baseUrl, useViewState: true, showWriteActions: true });
   }
-  return renderRoutineList({ baseUrl, useViewState: true, showWriteActions: false });
+  return renderRoutineList({ baseUrl, useViewState: true, showWriteActions: true });
 };
 
 module.exports = {

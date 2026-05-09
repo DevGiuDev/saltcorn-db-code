@@ -2,11 +2,12 @@
 
 Saltcorn DB Code is a Saltcorn plugin for inspecting and managing PostgreSQL database code objects from the Saltcorn UI.
 
-The MVP is PostgreSQL-only and currently focuses on read-only routine introspection:
+The MVP is PostgreSQL-only and currently supports:
 
 - List functions and procedures in the current tenant schema.
 - View routine metadata.
 - View the full SQL definition returned by PostgreSQL.
+- Create functions with a structured form.
 - Restrict access to Saltcorn administrators.
 - Show a clear unsupported-database message on SQLite.
 
