@@ -498,7 +498,7 @@ test("edit POST route — wrong schema rejected", async () => {
 test("delete form route renders confirmation", async () => {
   const mocks = getMocks();
   mocks.db.query = async (sql, params) => {
-    if (sql.includes("pg_depend")) return { rows: [], rowCount: 0 };
+    if (sql.includes("pg_describe_object")) return { rows: [], rowCount: 0 };
     if (sql.includes("p.oid")) return { rows: [SAMPLE_ROUTINES[0]], rowCount: 1 };
     return { rows: [], rowCount: 0 };
   };
@@ -517,7 +517,7 @@ test("delete form route renders confirmation", async () => {
 test("delete form route shows dependencies", async () => {
   const mocks = getMocks();
   mocks.db.query = async (sql, params) => {
-    if (sql.includes("pg_depend")) {
+    if (sql.includes("pg_describe_object")) {
       return { rows: [{ deptype: "n", dependent_object: "trigger my_trigger on public.users" }], rowCount: 1 };
     }
     if (sql.includes("p.oid")) return { rows: [SAMPLE_ROUTINES[0]], rowCount: 1 };
@@ -545,7 +545,7 @@ test("delete POST route — success with correct name", async () => {
   const mocks = getMocks();
   const queries = [];
   mocks.db.query = async (sql, params) => {
-    if (sql.includes("pg_depend")) return { rows: [], rowCount: 0 };
+    if (sql.includes("pg_describe_object")) return { rows: [], rowCount: 0 };
     if (sql.includes("p.oid")) return { rows: [SAMPLE_ROUTINES[0]], rowCount: 1 };
     queries.push(sql);
     return { rows: [], rowCount: 0 };
@@ -562,7 +562,7 @@ test("delete POST route — success with correct name", async () => {
 test("delete POST route — wrong confirmation name rejected", async () => {
   const mocks = getMocks();
   mocks.db.query = async (sql, params) => {
-    if (sql.includes("pg_depend")) return { rows: [], rowCount: 0 };
+    if (sql.includes("pg_describe_object")) return { rows: [], rowCount: 0 };
     if (sql.includes("p.oid")) return { rows: [SAMPLE_ROUTINES[0]], rowCount: 1 };
     return { rows: [], rowCount: 0 };
   };
@@ -961,7 +961,7 @@ test("edit POST redirects to view detail URL after success", async () => {
 test("delete POST redirects to view URL after success", async () => {
   const mocks = getMocks();
   mocks.db.query = async (sql, params) => {
-    if (sql.includes("pg_depend")) return { rows: [], rowCount: 0 };
+    if (sql.includes("pg_describe_object")) return { rows: [], rowCount: 0 };
     if (sql.includes("p.oid")) return { rows: [SAMPLE_ROUTINES[0]], rowCount: 1 };
     return { rows: [], rowCount: 0 };
   };

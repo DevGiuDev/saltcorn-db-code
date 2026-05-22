@@ -1,5 +1,6 @@
 const Workflow = require("@saltcorn/data/models/workflow");
 const { renderRoutineList, renderRoutineDetail } = require("../lib/render-routines");
+const { div, text } = require("../lib/markup-helpers");
 
 const configuration_workflow = () => new Workflow({ steps: [] });
 
@@ -7,18 +8,18 @@ const get_state_fields = () => [
   {
     name: "routine_oid",
     type: "Integer",
-    required: false
+    required: false,
   },
   {
     name: "kind",
     type: "String",
-    required: false
-  }
+    required: false,
+  },
 ];
 
 const run = async (tableId, viewname, configuration, state, { req }) => {
   if (!req || !req.user || req.user.role_id !== 1) {
-    return `<div class="alert alert-danger">DB Code Console is available to administrators only.</div>`;
+    return div({ class: "alert alert-danger" }, "DB Code Console is available to administrators only.");
   }
 
   const baseUrl = `/view/${encodeURIComponent(viewname)}`;
@@ -35,5 +36,5 @@ module.exports = {
   tableless: true,
   configuration_workflow,
   get_state_fields,
-  run
+  run,
 };

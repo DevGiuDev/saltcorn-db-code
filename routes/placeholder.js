@@ -1,10 +1,14 @@
 const { requireAdmin } = require("../lib/auth");
-const { escapeHtml, page } = require("../lib/html");
+const { page } = require("../lib/html");
+const { div, i, a, text } = require("../lib/markup-helpers");
 
 function placeholder(title, message) {
   return async function route(req, res) {
     if (!requireAdmin(req, res)) return;
-    page(req, res, title, `<p><a href="/db-code">← Back to DB Code</a></p><div class="alert alert-info">${escapeHtml(message)}</div>`);
+    page(req, res, title, [
+      a({ href: "/db-code" }, "\u2190 Back to DB Code"),
+      div({ class: "alert alert-info" }, text(message)),
+    ].join(""));
   };
 }
 
