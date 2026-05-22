@@ -1,6 +1,6 @@
 {
   "name": "saltcorn-db-code",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Saltcorn plugin to inspect and manage PostgreSQL database routines (functions and stored procedures) from the Saltcorn UI.",
   "main": "index.js",
   "scripts": {
